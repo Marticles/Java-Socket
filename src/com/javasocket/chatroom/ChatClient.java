@@ -7,17 +7,17 @@ import java.awt.*;
 
 public class ChatClient {
     public static void main(String[] args) throws IOException {
-        Socket s1 = new Socket("localhost", 54321);
-        DataInputStream dis = new DataInputStream(s1.getInputStream());
-        final DataOutputStream dos = new DataOutputStream(s1.getOutputStream());
+        Socket socket = new Socket("localhost", 54321);
+        DataInputStream dis = new DataInputStream(socket.getInputStream());
+        final DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
         Frame myframe = new Frame("ChatRoom");
         Panel panelx = new Panel();
-        final TextField input = new TextField(35);
-        TextArea display = new TextArea(19, 35);
-        panelx.add(display);
+        final TextField input = new TextField(50);
+        TextArea textWindows = new TextArea(20, 50);
+        panelx.add(textWindows);
         panelx.add(input);
         myframe.add(panelx);
-        new receiveThread(dis, display); // 创建启动接收消息的线程
+        new receiveThread(dis, textWindows); // 创建启动接收消息的线程
         input.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -27,13 +27,11 @@ public class ChatClient {
                 }
             }
         });
-
         myframe.setSize(500, 400);
         myframe.setVisible(true);
     }
 }
 
-//接收消息线程循环读取网络消息，显示在文本域
 class receiveThread extends Thread {
     DataInputStream dis;
     TextArea displayarea;
@@ -47,8 +45,8 @@ class receiveThread extends Thread {
     public void run() {
         for (;;) {
             try {
-                String str = dis.readUTF(); // 读来自服务器的消息
-                displayarea.append(str + "\n"); // 将消息添加到文本域显示
+                String str = dis.readUTF(); 
+                displayarea.append(str + "\n"); 
             } catch (IOException e) {
             }
         }

@@ -5,19 +5,19 @@ import java.io.*;
 import java.util.*;
 
 public class ChatService {
-    public static ArrayList<Client> allclient = new ArrayList<Client>(); // 存放所有通信线程
-    public static int clientnum = 0; // 统计客户连接的计数变量
-
+    public static ArrayList<Client> allclient = new ArrayList<Client>(); 
+    public static int clientnum = 0; 
     public static void main(String args[]) {
         try {
-            ServerSocket s = new ServerSocket(54321);
+            ServerSocket serverSocket = new ServerSocket(54321);
+            System.out.println("服务器启动，等待客户端连接....");
             while (true) {
-                Socket s1 = s.accept(); // 等待客户连接
-                DataOutputStream dos = new DataOutputStream(s1.getOutputStream());
-                DataInputStream din = new DataInputStream(s1.getInputStream());
-                Client x = new Client(clientnum, dos, din); // 创建与客户对应的通信线程
-                allclient.add(x); // 将线程加入ArrayList中
-                x.start();
+                Socket socket = serverSocket.accept(); 
+                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                DataInputStream din = new DataInputStream(socket.getInputStream());
+                Client client = new Client(clientnum, dos, din);
+                allclient.add(client); 
+                client.start();
                 clientnum++;
             }
         } catch (IOException e) {
@@ -26,9 +26,9 @@ public class ChatService {
 
 }
 
-//通信线程处理与对应的客户通信，将来自客户数据发往其他客户
+// 多线程处理客户端信息
 class Client extends Thread {
-    int id; // 客户的标识
+    int id; 
     DataOutputStream dos; // 去往客户的输出流
     DataInputStream din; // 来自客户的输入流
 
@@ -38,7 +38,7 @@ class Client extends Thread {
         this.din = din;
     }
 
-    public void run() { // 循环读取客户数据转发给其他客户
+    public void run() {
         while (true) {
             try {
                 String message = "客户" + id + ":" + din.readUTF(); // 读客户数据
